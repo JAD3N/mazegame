@@ -1,0 +1,22 @@
+{
+	"compilerOptions": {
+		"target": "es6",
+		"module": "commonjs",
+		"outDir": "dist",
+		"lib": ["dom", "es2015", "es2016", "es2017"],
+		"noImplicitAny": true,
+		"preserveConstEnums": true,
+		"removeComments": true,
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+		"sourceMap": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true
+	},
+	"files": [
+		"./typings/global.d.ts"
+	],
+	"include": [
+		"./src/**/*"
+	]
+}
