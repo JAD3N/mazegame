@@ -51,6 +51,16 @@ export class Camera {
 
 		this.x = this.panEase(this.startX, this.targetX, progress);
 		this.y = this.panEase(this.startY, this.targetY, progress);
+
+		if(progress === 1) {
+			this.panStart = null;
+			this.panTime = null;
+			this.panEase = null;
+		}
+	}
+
+	public get isPanning(): boolean {
+		return !!this.panStart;
 	}
 
 }

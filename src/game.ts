@@ -3,6 +3,7 @@ import {Camera} from './camera';
 import {Assets} from './assets';
 import {Player} from './sprites/player';
 import {Controller} from './controller';
+import {Room} from './room';
 
 declare global {
 	class Stats {
@@ -21,6 +22,8 @@ export class Game {
 
 	public player: Player;
 	public controller: Controller;
+	public rooms: Room[];
+	public currentRoom: Room;
 
 	public state: Game.State;
 	public stats: Stats;
@@ -38,7 +41,10 @@ export class Game {
 				'player-back': 'assets/textures/player-back.png',
 				'player-left': 'assets/textures/player-left.png',
 				'player-right': 'assets/textures/player-right.png',
-				'player-idle': 'assets/textures/player-idle.png'
+				'player-idle': 'assets/textures/player-idle.png',
+
+				'ground': 'assets/textures/ground.png',
+				'treasure': 'assets/textures/treasure.png'
 			}
 		})
 
@@ -56,6 +62,8 @@ export class Game {
 
 		this.player = new Player();
 		this.controller = new Controller(this.player);
+		
+		this.generateRooms();
 
 		// start render loop
 		this.assets.load()
@@ -63,13 +71,16 @@ export class Game {
 			.catch(() => alert('Error loading textures!'));
 	}
 
-	private loop(): void {
-		const renderer = this.renderer;
-		const controller = this.controller;
-		const camera = this.camera;
-		const stats = this.stats;
-		const scope = this;
+	private generateRooms(): void {
+		this.rooms = [];
+		this.rooms.push(this.currentRoom = new Room(8, 8));
 
+		this.player.x = this.currentRoom.center.x;
+		this.player.y = this.currentRoom.center.y;
+		this.player.room = this.currentRoom;
+	}
+
+	private loop(): void {
 		// set to true to force a resize on start
 		let hasResized = true;
 
@@ -77,27 +88,33 @@ export class Game {
 			hasResized = true;
 		});
 
-		function run(): void {
+		const run: () => void = (): void => {
 			if(hasResized) {
 				hasResized = false;
 
 				// resize canvas
-				renderer.resize(
-					renderer.canvas.clientWidth,
-					renderer.canvas.clientHeight
+				this.renderer.resize(
+					this.renderer.canvas.clientWidth,
+					this.renderer.canvas.clientHeight
 				);
 			}
 
 			// render canvas
-			controller.update();
-			camera.update();
-			renderer.render(camera);
+			this.controller.update();
 
-			if(scope.showStats) {
-				stats.update();
-				stats.dom.style.display = 'block';
+			if(!this.camera.isPanning) {
+				this.camera.x = this.player.x;
+				this.camera.y = this.player.y;
+			}
+
+			this.camera.update();
+			this.renderer.render(this.camera);
+
+			if(this.showStats) {
+				this.stats.update();
+				this.stats.dom.style.display = 'block';
 			} else {
-				stats.dom.style.display = 'none';
+				this.stats.dom.style.display = 'none';
 			}
 
 			// request next render batch

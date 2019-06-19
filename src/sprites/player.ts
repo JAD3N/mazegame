@@ -1,6 +1,8 @@
 import {Sprite} from './sprite';
 import {Direction} from '../utils/direction';
 import {Renderer} from '../renderer';
+import {Room} from '../room';
+import {Treasure} from './treasure';
 
 let TEXTURE_FRONT: HTMLImageElement;
 let TEXTURE_BACK: HTMLImageElement;
@@ -8,22 +10,29 @@ let TEXTURE_LEFT: HTMLImageElement;
 let TEXTURE_RIGHT: HTMLImageElement;
 let TEXTURE_IDLE: HTMLImageElement;
 
-let PLAYER_SPEED = 6.5;
-
 export class Player extends Sprite {
+
+	public static readonly SPEED: number = 6.5;
 
 	public direction: Direction;
 	public isMoving: boolean;
+	public room: Room;
 
-	public constructor() {
+	public constructor(room: Room = null) {
 		super({
-			x: 0, y: 0,
-			offsetX: -1, offsetY: -2,
-			width: 2, height: 2
+			x: 0,
+			y: 0,
+			
+			offsetX: -0.5,
+			offsetY: -1,
+			
+			width: 1,
+			height: 1
 		});
 
 		this.direction = Direction.SOUTH;
 		this.isMoving = true;
+		this.room = room;
 	}
 
 	public update(deltaTime: number) {
@@ -31,18 +40,18 @@ export class Player extends Sprite {
 			switch(this.direction) {
 				case Direction.NORTH:
 					this.velocityX = 0;
-					this.velocityY = -PLAYER_SPEED;
+					this.velocityY = -Player.SPEED;
 					break;
 				case Direction.SOUTH:
 					this.velocityX = 0;
-					this.velocityY = PLAYER_SPEED;
+					this.velocityY = Player.SPEED;
 					break;
 				case Direction.EAST:
-					this.velocityX = PLAYER_SPEED;
+					this.velocityX = Player.SPEED;
 					this.velocityY = 0;
 					break;
 				case Direction.WEST:
-					this.velocityX = -PLAYER_SPEED;
+					this.velocityX = -Player.SPEED;
 					this.velocityY = 0;
 					break;
 			}
@@ -51,7 +60,27 @@ export class Player extends Sprite {
 			this.velocityY = 0;
 		}
 
-		super.update(deltaTime);
+		if(this.room) {
+			const oldX = this.x;
+			const oldY = this.y;
+
+			super.update(deltaTime);
+
+			if(!this.room.contains(this)) {
+				this.x = oldX;
+				this.y = oldY;
+			}
+		} else {
+			super.update(deltaTime);
+		}
+
+		if(this.room) {
+			this.room.treasure.forEach((treasure: Treasure) => {
+				if(this.hits(treasure) && treasure.stage === Treasure.Stage.CLOSED) {
+					treasure.open();
+				}
+			});
+		}
 	}
 
 	public render(renderer: Renderer): void {

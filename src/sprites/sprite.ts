@@ -39,10 +39,10 @@ export abstract class Sprite {
 		if(x instanceof Sprite) {
 			const sprite: Sprite = x;
 
-			return this.hits(sprite.x, sprite.y)
-				|| this.hits(sprite.x, sprite.y + sprite.height)
-				|| this.hits(sprite.x + sprite.width, sprite.y)
-				|| this.hits(sprite.x + sprite.width, sprite.y + sprite.height);
+			return this.hits(sprite.x + sprite.offsetX, sprite.y + sprite.offsetY)
+				|| this.hits(sprite.x + sprite.offsetX, sprite.y + sprite.offsetY + sprite.height)
+				|| this.hits(sprite.x + sprite.offsetX + sprite.width, sprite.y + sprite.offsetY)
+				|| this.hits(sprite.x + sprite.offsetX + sprite.width, sprite.y + sprite.offsetY + sprite.height);
 		} else {
 			if(x < this.x + this.offsetX || x > this.x + this.width + this.offsetX) {
 				return false;
@@ -64,8 +64,14 @@ export abstract class Sprite {
 		}
 	}
 
-	public renderTexture(renderer: Renderer, texture: CanvasImageSource, region?: Sprite.TextureRegion): void {
+	public renderTexture(renderer: Renderer, texture: CanvasImageSource, region?: Sprite.TextureRegion, x?: number, y?: number, width?: number, height?: number): void {
 		const ctx = renderer.ctx;
+
+		if(x === undefined) x = this.x + this.offsetX;
+		if(y === undefined) y = this.y + this.offsetY;
+
+		if(width === undefined) width = this.width;
+		if(height === undefined) height = this.height;
 
 		ctx.drawImage(
 			// what to render
@@ -76,9 +82,8 @@ export abstract class Sprite {
 			region.width, region.height,
 
 			// where to render on screen
-			this.x + this.offsetX,
-			this.y + this.offsetY,
-			this.width, this.height
+			x, y,
+			width, height
 		);
 	}
 

@@ -20,6 +20,8 @@ export class Controller {
 	}
 
 	private onKeyDown(event: KeyboardEvent): void {
+		event.preventDefault();
+
 		const activeKeys = this.activeKeys;
 		const keyCode = event.keyCode;
 
@@ -30,6 +32,8 @@ export class Controller {
 	}
 
 	private onKeyUp(event: KeyboardEvent): void {
+		event.preventDefault();
+	
 		const activeKeys = this.activeKeys;
 		const keyCode = event.keyCode;
 
