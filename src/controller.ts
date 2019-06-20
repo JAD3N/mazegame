@@ -1,10 +1,12 @@
 import {Player} from './sprites/player';
 import {Direction} from './utils/direction';
+import {Game} from './game';
 
 const KEY_W = 87;
 const KEY_A = 65;
 const KEY_S = 83;
 const KEY_D = 68;
+const KEY_H = 72;
 
 export class Controller {
 
@@ -20,27 +22,25 @@ export class Controller {
 	}
 
 	private onKeyDown(event: KeyboardEvent): void {
-		event.preventDefault();
-
 		const activeKeys = this.activeKeys;
 		const keyCode = event.keyCode;
 
-		if(keyCode === KEY_W && !activeKeys.has(KEY_W)) activeKeys.add(KEY_W);
-		if(keyCode === KEY_A && !activeKeys.has(KEY_A)) activeKeys.add(KEY_A);
-		if(keyCode === KEY_S && !activeKeys.has(KEY_S)) activeKeys.add(KEY_S);
-		if(keyCode === KEY_D && !activeKeys.has(KEY_D)) activeKeys.add(KEY_D);
+		if(keyCode === KEY_W && !activeKeys.has(KEY_W)) activeKeys.add(KEY_W), event.preventDefault();
+		if(keyCode === KEY_A && !activeKeys.has(KEY_A)) activeKeys.add(KEY_A), event.preventDefault();
+		if(keyCode === KEY_S && !activeKeys.has(KEY_S)) activeKeys.add(KEY_S), event.preventDefault();
+		if(keyCode === KEY_D && !activeKeys.has(KEY_D)) activeKeys.add(KEY_D), event.preventDefault();
+
+		if(keyCode === KEY_H) Game.SHOW_HITBOXES = !Game.SHOW_HITBOXES;
 	}
 
 	private onKeyUp(event: KeyboardEvent): void {
-		event.preventDefault();
-	
 		const activeKeys = this.activeKeys;
 		const keyCode = event.keyCode;
 
-		if(keyCode === KEY_W && activeKeys.has(KEY_W)) activeKeys.delete(KEY_W);
-		if(keyCode === KEY_A && activeKeys.has(KEY_A)) activeKeys.delete(KEY_A);
-		if(keyCode === KEY_S && activeKeys.has(KEY_S)) activeKeys.delete(KEY_S);
-		if(keyCode === KEY_D && activeKeys.has(KEY_D)) activeKeys.delete(KEY_D);
+		if(keyCode === KEY_W && activeKeys.has(KEY_W)) activeKeys.delete(KEY_W), event.preventDefault();
+		if(keyCode === KEY_A && activeKeys.has(KEY_A)) activeKeys.delete(KEY_A), event.preventDefault();
+		if(keyCode === KEY_S && activeKeys.has(KEY_S)) activeKeys.delete(KEY_S), event.preventDefault();
+		if(keyCode === KEY_D && activeKeys.has(KEY_D)) activeKeys.delete(KEY_D), event.preventDefault();
 	}
 
 	public update(): void {

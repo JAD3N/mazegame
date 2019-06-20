@@ -1,4 +1,5 @@
 import {Renderer} from '../renderer';
+import {BoundingBox} from '../boundingBox';
 
 export abstract class Sprite {
 
@@ -14,13 +15,16 @@ export abstract class Sprite {
 	public velocityX: number;
 	public velocityY: number;
 
+	public boundingBox: BoundingBox;
+
 	public constructor({
 		x = 0,
 		y = 0,
 		offsetX = 0,
 		offsetY = 0,
 		width,
-		height
+		height,
+		boundingBox = null
 	}: Sprite.Options) {
 		this.x = x;
 		this.y = y;
@@ -33,34 +37,15 @@ export abstract class Sprite {
 
 		this.velocityX = 0;
 		this.velocityY = 0;
-	}
 
-	public hits(x: number | Sprite, y?: number): boolean {
-		if(x instanceof Sprite) {
-			const sprite: Sprite = x;
-
-			return this.hits(sprite.x + sprite.offsetX, sprite.y + sprite.offsetY)
-				|| this.hits(sprite.x + sprite.offsetX, sprite.y + sprite.offsetY + sprite.height)
-				|| this.hits(sprite.x + sprite.offsetX + sprite.width, sprite.y + sprite.offsetY)
-				|| this.hits(sprite.x + sprite.offsetX + sprite.width, sprite.y + sprite.offsetY + sprite.height);
-		} else {
-			if(x < this.x + this.offsetX || x > this.x + this.width + this.offsetX) {
-				return false;
-			} else if(y < this.y + this.offsetY || y > this.y + this.height + this.offsetY) {
-				return false;
-			} else {
-				return true;
-			}
+		if(boundingBox instanceof BoundingBox) {
+			this.boundingBox = boundingBox;
+		} else if(boundingBox === true) {
+			this.boundingBox = new BoundingBox();
 		}
-	}
-	
-	public isInside(x: number, y: number, width: number, height: number): boolean {
-		if(this.x + this.offsetX < x || this.x + this.width + this.offsetX > x + width) {
-			return false;
-		} else if(this.y + this.offsetY < y || this.y + this.height + this.offsetY > y + height) {
-			return false;
-		} else {
-			return true;
+
+		if(this.boundingBox) {
+			this.updateBoundingBox();
 		}
 	}
 
@@ -91,16 +76,23 @@ export abstract class Sprite {
 		const dx = this.velocityX;
 		const dy = this.velocityY;
 
-		const oldX = this.x;
-		const oldY = this.y;
-
 		this.x += dx * deltaTime;
 		this.y += dy * deltaTime;
 
-		/*if(!this.isInside(0, 0, 10, 10)) {
-			this.x = oldX;
-			this.y = oldY;
-		}*/
+		if(this.boundingBox) {
+			this.updateBoundingBox();
+		}
+	}
+
+	public distanceTo(x: number, y: number): number {
+		return Math.sqrt(
+			((this.x - x) ** 2) +
+			((this.y - y) ** 2)
+		);
+	}
+
+	public updateBoundingBox(): void {
+		// empty to allow override
 	}
 
 	public abstract render(renderer: Renderer): void;
@@ -110,12 +102,13 @@ export abstract class Sprite {
 export namespace Sprite {
 
 	export interface Options {
-		x: number;
-		y: number;
-		offsetX: number;
-		offsetY: number;
+		x?: number;
+		y?: number;
+		offsetX?: number;
+		offsetY?: number;
 		width: number;
 		height: number;
+		boundingBox?: BoundingBox | boolean;
 	}
 
 	export interface TextureRegion {

@@ -17,22 +17,36 @@ export class Player extends Sprite {
 	public direction: Direction;
 	public isMoving: boolean;
 	public room: Room;
+	public gold: number;
+	public lastTeleport: number;
 
-	public constructor(room: Room = null) {
+	public constructor({
+		x = 0,
+		y = 0,
+
+		direction = Direction.SOUTH,
+		isMoving = false,
+		room = null,
+		gold = 0
+	}: Player.Options = {}) {
 		super({
-			x: 0,
-			y: 0,
-			
+			x,
+			y,
+
 			offsetX: -0.5,
 			offsetY: -1,
 			
 			width: 1,
-			height: 1
+			height: 1,
+
+			boundingBox: true
 		});
 
-		this.direction = Direction.SOUTH;
-		this.isMoving = true;
+		this.direction = direction;
+		this.isMoving = isMoving;
 		this.room = room;
+		this.gold = gold;
+		this.lastTeleport = performance.now();
 	}
 
 	public update(deltaTime: number) {
@@ -69,6 +83,8 @@ export class Player extends Sprite {
 			if(!this.room.contains(this)) {
 				this.x = oldX;
 				this.y = oldY;
+
+				this.updateBoundingBox();
 			}
 		} else {
 			super.update(deltaTime);
@@ -76,8 +92,9 @@ export class Player extends Sprite {
 
 		if(this.room) {
 			this.room.treasure.forEach((treasure: Treasure) => {
-				if(this.hits(treasure) && treasure.stage === Treasure.Stage.CLOSED) {
+				if(treasure.stage === Treasure.Stage.CLOSED && this.boundingBox.hits(treasure.boundingBox)) {
 					treasure.open();
+					this.gold++;
 				}
 			});
 		}
@@ -119,6 +136,29 @@ export class Player extends Sprite {
 		} else {
 			this.renderTexture(renderer, TEXTURE_IDLE, textureOptions);
 		}
+	}
+
+	public updateBoundingBox(): void {
+		const box = this.boundingBox;
+
+		box.x = this.x + this.offsetX + 2 / 16;
+		box.y = this.y + this.offsetY;
+
+		box.width = 12 / 16;
+		box.height = 1;
+	}
+
+}
+
+export namespace Player {
+
+	export interface Options {
+		x?: number;
+		y?: number;
+		direction?: Direction;
+		room?: Room;
+		isMoving?: boolean;
+		gold?: number;
 	}
 
 }

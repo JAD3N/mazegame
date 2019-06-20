@@ -4,6 +4,8 @@ import {Assets} from './assets';
 import {Player} from './sprites/player';
 import {Controller} from './controller';
 import {Room} from './room';
+import {Direction} from './utils/direction';
+import {RoomMap} from './map';
 
 declare global {
 	class Stats {
@@ -14,7 +16,8 @@ declare global {
 
 export class Game {
 
-	public static readonly DEBUG: boolean = true;
+	public static DEBUG: boolean = true;
+	public static SHOW_HITBOXES: boolean = false;
 
 	public readonly renderer: Renderer;
 	public readonly camera: Camera;
@@ -22,8 +25,7 @@ export class Game {
 
 	public player: Player;
 	public controller: Controller;
-	public rooms: Room[];
-	public currentRoom: Room;
+	public map: RoomMap;
 
 	public state: Game.State;
 	public stats: Stats;
@@ -43,7 +45,6 @@ export class Game {
 				'player-right': 'assets/textures/player-right.png',
 				'player-idle': 'assets/textures/player-idle.png',
 
-				'ground': 'assets/textures/ground.png',
 				'treasure': 'assets/textures/treasure.png'
 			}
 		})
@@ -68,19 +69,43 @@ export class Game {
 		// start render loop
 		this.assets.load()
 			.then(() => this.loop())
-			.catch(() => alert('Error loading textures!'));
+			.catch(() => alert('Error loading textures.'));
 	}
 
 	private generateRooms(): void {
-		this.rooms = [];
-		this.rooms.push(this.currentRoom = new Room(8, 8));
+		const roomA = new Room({
+			width: 10,
+			height: 10
+		});
 
-		this.player.x = this.currentRoom.center.x;
-		this.player.y = this.currentRoom.center.y;
-		this.player.room = this.currentRoom;
+		const roomB = new Room({
+			width: 5,
+			height: 5,
+
+			routes: {
+				south: roomA
+			}
+		});
+
+		roomA.addRoute(Direction.NORTH, roomB);
+
+		this.map = new RoomMap();
+		this.map.generate();
+
+		const starterRoom = this.map.starterRoom;
+
+		this.player.room = starterRoom;
+		this.player.x = Math.random() * (starterRoom.width - 2) + 1;
+		this.player.y = Math.random() * (starterRoom.height - 2) + 1;
+	}
+
+	public get currentRoom(): Room {
+		return this.player.room;
 	}
 
 	private loop(): void {
+		console.log('Game started.');
+
 		// set to true to force a resize on start
 		let hasResized = true;
 
@@ -88,40 +113,54 @@ export class Game {
 			hasResized = true;
 		});
 
-		const run: () => void = (): void => {
-			if(hasResized) {
-				hasResized = false;
+		try {
+			const run: () => void = (): void => {
+				if(hasResized) {
+					hasResized = false;
 
-				// resize canvas
-				this.renderer.resize(
-					this.renderer.canvas.clientWidth,
-					this.renderer.canvas.clientHeight
-				);
+					// resize canvas
+					this.renderer.resize(
+						this.renderer.canvas.clientWidth,
+						this.renderer.canvas.clientHeight
+					);
+				}
+
+				// render canvas
+				this.controller.update();
+
+				if(!this.camera.isPanning) {
+					this.camera.x = this.player.x;
+					this.camera.y = this.player.y;
+				}
+
+				this.camera.update();
+				this.currentRoom.update(this.player);
+				this.renderer.render(this.camera);
+
+				this.updateGoldCounter();
+
+				if(this.showStats) {
+					this.stats.update();
+					this.stats.dom.style.display = 'block';
+				} else {
+					this.stats.dom.style.display = 'none';
+				}
+
+				// request next render batch
+				requestAnimationFrame(run);
 			}
 
-			// render canvas
-			this.controller.update();
-
-			if(!this.camera.isPanning) {
-				this.camera.x = this.player.x;
-				this.camera.y = this.player.y;
-			}
-
-			this.camera.update();
-			this.renderer.render(this.camera);
-
-			if(this.showStats) {
-				this.stats.update();
-				this.stats.dom.style.display = 'block';
-			} else {
-				this.stats.dom.style.display = 'none';
-			}
-
-			// request next render batch
-			requestAnimationFrame(run);
+			run();
+		} catch(err) {
+			alert('Render error!');
 		}
+	}
 
-		run();
+	public updateGoldCounter(): void {
+		const gold = this.player.gold;
+		const el = document.body.querySelector('.gold-counter .qty');
+
+		el.innerHTML = (gold * 10) + '';
 	}
 
 }

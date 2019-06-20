@@ -3,7 +3,9 @@ import {Camera} from './camera';
 import {Assets} from './assets';
 import {Treasure} from './sprites/treasure';
 import {Sprite} from './sprites/sprite';
-import {Ground} from './sprites/ground';
+import {Floor} from './sprites/floor';
+import {RoomMap} from './map';
+import {Direction} from './utils/direction';
 
 export class Renderer {
 
@@ -69,6 +71,8 @@ export class Renderer {
 		const offsetY = height / 2 | 0;
 
 		ctx.fillStyle = '#000000';
+		ctx.globalAlpha = 1;
+
 		ctx.translate(offsetX, offsetY);
 		ctx.scale(tileSize, tileSize);
 		ctx.translate(-camera.x, -camera.y);
@@ -80,14 +84,15 @@ export class Renderer {
 		// update player
 		player.update(deltaTime);
 
-		const sprites: Sprite[] = [player, room.floor];
+		const sprites: Sprite[] = [player];
 		
+		room.renderFloor(this);
 		room.treasure.forEach(function(treasure: Treasure) {
 			sprites.push(treasure);
 		});
 
 		sprites.sort(function(a: Sprite, b: Sprite) {
-			if(a instanceof Ground) {
+			if(a instanceof Floor) {
 				return -1;
 			}
 
@@ -98,9 +103,51 @@ export class Renderer {
 			} else {
 				return 0;
 			}
-		}).forEach((sprite: Sprite) => sprite.render(this));
+		}).forEach((sprite: Sprite) => {
+			sprite.render(this);
+			
+			if(Game.DEBUG && Game.SHOW_HITBOXES && sprite.boundingBox) {
+				const box = sprite.boundingBox;
+
+				ctx.fillStyle = undefined;
+				ctx.strokeStyle = '#ff0000';
+				ctx.lineWidth = 1 / tileSize;
+				ctx.setLineDash([5 / tileSize]);
+
+				ctx.strokeRect(box.x, box.y, box.width, box.height);
+			}
+		});
 
 		ctx.restore();
+
+		const mapSize = 15;
+		const mapOffsetX = 50;
+		const mapOffsetY = 100;
+		const map = this.game.map;
+		
+		for(let x = 0; x < RoomMap.WIDTH; x++) {
+			for(let y = 0; y < RoomMap.HEIGHT; y++) {
+				const room = map.getRoom(x, y);
+				const inRoom = this.game.currentRoom === room;
+
+				if(inRoom) {
+					ctx.fillStyle = '#ff0000';
+				} else {
+					ctx.fillStyle = '#ffffff';
+				}
+
+				const tileX = x * mapSize;
+				const tileY = y * mapSize;
+
+				ctx.globalAlpha = 0.5;
+				ctx.fillRect(
+					tileX + mapOffsetX,
+					tileY + mapOffsetY,
+					mapSize,
+					mapSize
+				);
+			}
+		}
 	}
 
 	public get assets(): Assets {

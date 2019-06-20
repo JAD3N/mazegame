@@ -14,7 +14,7 @@
 		"esModuleInterop": true
 	},
 	"files": [
-		"./typings/global.d.ts"
+		"./typings/generate-maze.d.ts"
 	],
 	"include": [
 		"./src/**/*"

@@ -25,7 +25,7 @@ export class Assets {
 				}
 			}
 
-			console.log('Textures loaded!');
+			console.log('Textures loaded.');
 		}
 	}
 
