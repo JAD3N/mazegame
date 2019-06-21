@@ -103,12 +103,12 @@ export class Game {
 		this.map = new RoomMap(seed);
 		this.map.generate();
 
-		const starterRoom = this.map.starterRoom;
+		const startRoom = this.map.startRoom;
 		const random = this.map.prng;
 
-		this.player.room = starterRoom;
-		this.player.x = random() * (starterRoom.width - 2) + 1;
-		this.player.y = random() * (starterRoom.height - 2) + 1;
+		this.player.room = startRoom;
+		this.player.x = random() * (startRoom.width - 2) + 1;
+		this.player.y = random() * (startRoom.height - 2) + 1;
 	}
 
 	public get currentRoom(): Room {

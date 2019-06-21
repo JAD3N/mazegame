@@ -5,14 +5,16 @@ import seedrandom from 'seedrandom';
 
 export class RoomMap {
 
-	public static readonly WIDTH: number = 5;
-	public static readonly HEIGHT: number = 5;
+	public static readonly WIDTH: number = 8;
+	public static readonly HEIGHT: number = 8;
 
 	public readonly seed: string;
 
 	public prng: seedrandom.prng;
 	public rooms: Room[];
-	public starterRoom: Room;
+
+	public startRoom: Room;
+	public endRoom: Room;
 
 	public constructor(seed: string) {
 		this.rooms = [];
@@ -88,11 +90,18 @@ export class RoomMap {
 			}
 		}
 
-		const starterRoom = Math.ceil(random() * this.rooms.length);
-		const endRoom = Math.ceil(random() * this.rooms.length);
+		let startRoom, endRoom;
 
-		this.starterRoom = this.rooms[starterRoom];
-		this.rooms[endRoom].isEnd = true;
+		do {
+			startRoom = Math.floor(random() * this.rooms.length);
+			endRoom = Math.floor(random() * this.rooms.length);
+
+			console.log(startRoom, endRoom);
+		} while(startRoom === endRoom);
+
+		this.startRoom = this.rooms[startRoom];
+		this.endRoom = this.rooms[endRoom];
+		this.endRoom.isEnd = true;
 	}
 
 	public getRoom(x: number, y: number): Room {
