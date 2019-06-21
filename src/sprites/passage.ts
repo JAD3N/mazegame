@@ -8,8 +8,10 @@ export class Passage extends Sprite {
 
 	public static readonly TELEPORT_BOX_SIZE: number = 1;
 
+	public room: Room;
 	public direction: Direction;
 	public teleportBox: BoundingBox;
+	public isInside: boolean;
 
 	private gradient: CanvasGradient;
 
@@ -130,6 +132,7 @@ export class Passage extends Sprite {
 
 		this.direction = direction;
 		this.teleportBox = teleportBox;
+		this.room = room;
 	}
 
 	public render(renderer: Renderer): void {

@@ -4,6 +4,7 @@ import {Assets} from './assets';
 import {Sprite} from './sprites/sprite';
 import {Floor} from './sprites/floor';
 import {RoomMap} from './map';
+import { Direction } from './utils/direction';
 
 export class Renderer {
 
@@ -18,9 +19,7 @@ export class Renderer {
 	public constructor(game: Game) {
 		this.game = game;
 		this.canvas = document.createElement('canvas');
-		this.ctx = this.canvas.getContext('2d', {
-			alpha: true
-		});
+		this.ctx = this.canvas.getContext('2d', {alpha: true});
 
 		if(this.ctx === null) {
 			throw new Error('Failed to create rendering context!');
@@ -43,6 +42,10 @@ export class Renderer {
 		}
 	}
 
+	public clear(): void {
+		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	}
+
 	public render(camera: Camera): void {
 		// calculate frame times
 		const now = performance.now();
@@ -58,8 +61,9 @@ export class Renderer {
 			height
 		} = this.canvas;
 
+		this.clear();
+
 		ctx.imageSmoothingEnabled = false;
-		ctx.clearRect(0, 0, width, height);
 		ctx.save();
 	
 		const minSize = Math.min(width, height);
@@ -149,6 +153,24 @@ export class Renderer {
 					mapSize,
 					mapSize
 				);
+				
+				if(!room.hasRoute(Direction.NORTH)) {
+					ctx.fillRect(
+						tileX + mapOffsetX,
+						tileY + mapOffsetY,
+						mapSize,
+						2
+					);
+				}
+
+				if(!room.hasRoute(Direction.WEST)) {
+					ctx.fillRect(
+						tileX + mapOffsetX,
+						tileY + mapOffsetY,
+						2,
+						mapSize
+					);
+				}
 			}
 		}
 	}

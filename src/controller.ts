@@ -10,6 +10,8 @@ const KEY_D = 68; // right
 const KEY_H = 72; // debug hitboxes
 const KEY_Q = 81; // drop coin
 
+const KEY_ESC = 27;
+
 function preventEvent(event: KeyboardEvent): void {
 	event.preventDefault();
 	event.stopPropagation();
@@ -17,15 +19,20 @@ function preventEvent(event: KeyboardEvent): void {
 
 export class Controller {
 
-	public player: Player;
+	public game: Game;
 	public activeKeys: Set<number>;
 
-	public constructor(player: Player) {
-		this.player = player;
+	public constructor(game: Game) {
+		this.game = game;
 		this.activeKeys = new Set<number>();
 
 		window.addEventListener('keydown', this.onKeyDown.bind(this));
 		window.addEventListener('keyup', this.onKeyUp.bind(this));
+		window.addEventListener('blur', this.resetKeys.bind(this));
+	}
+
+	private resetKeys(): void {
+		this.activeKeys.clear();
 	}
 
 	private onKeyDown(event: KeyboardEvent): void {
@@ -38,7 +45,9 @@ export class Controller {
 		if(keyCode === KEY_D && !activeKeys.has(KEY_D)) activeKeys.add(KEY_D), preventEvent(event);
 
 		if(keyCode === KEY_H) Game.SHOW_HITBOXES = !Game.SHOW_HITBOXES, preventEvent(event);
-		if(keyCode === KEY_Q) this.player.dropCoin(), preventEvent(event);
+		if(keyCode === KEY_Q) this.game.player.dropCoin(), preventEvent(event);
+
+		if(keyCode === KEY_ESC) this.game.showPauseMenu(), preventEvent(event);
 	}
 
 	private onKeyUp(event: KeyboardEvent): void {
@@ -53,7 +62,7 @@ export class Controller {
 
 	public update(): void {
 		const activeKeys = this.activeKeys;
-		const player = this.player;
+		const player = this.game.player;
 		player.isMoving = false;
 
 		if(activeKeys.has(KEY_W) && !activeKeys.has(KEY_S)) {

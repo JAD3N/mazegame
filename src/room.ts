@@ -13,6 +13,7 @@ export class Room {
 	public static readonly MAX_SIZE = 10;
 
 	public isEnd: boolean;
+	public isLocked: boolean;
 	public map: RoomMap;
 
 	public width: number;
@@ -73,6 +74,11 @@ export class Room {
 			}
 		}
 
+		/*this.sprites.add(new Troll({
+			x: this.center.x,
+			y: this.center.y + 0.9,
+		}));
+		this.isLocked = true;*/
 
 		if(routes.north) this.addRoute(Direction.NORTH, routes.north);
 		if(routes.east) this.addRoute(Direction.EAST, routes.east);
@@ -171,6 +177,15 @@ export class Room {
 			const room = route.destination;
 
 			if(box.hits(player.boundingBox)) {
+				if(this.isLocked) {
+					if(!passage.isInside) {
+						passage.isInside = true;
+						alert('You cannot leave until you have defeated the threat.');
+					}
+
+					return;
+				}
+
 				const oldRoom = player.room;
 				player.room = room;
 				player.lastTeleport = now;
@@ -196,6 +211,8 @@ export class Room {
 						player.y += dy;
 						break;
 				}
+			} else {
+				passage.isInside = false;
 			}
 		});
 	}

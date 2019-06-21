@@ -3,7 +3,7 @@ import {Direction} from '../utils/direction';
 import {Renderer} from '../renderer';
 import {Room} from '../room';
 import {Treasure} from './treasure';
-import { Coin } from './coin';
+import {Coin} from './coin';
 
 let TEXTURE_FRONT: HTMLImageElement;
 let TEXTURE_BACK: HTMLImageElement;
@@ -17,6 +17,7 @@ export class Player extends Sprite {
 
 	public direction: Direction;
 	public isMoving: boolean;
+	public isPaused: boolean;
 	public room: Room;
 	public gold: number;
 	public lastTeleport: number;
@@ -27,6 +28,7 @@ export class Player extends Sprite {
 
 		direction = Direction.SOUTH,
 		isMoving = false,
+		isPaused = false,
 		room = null,
 		gold = 0
 	}: Player.Options = {}) {
@@ -45,6 +47,7 @@ export class Player extends Sprite {
 
 		this.direction = direction;
 		this.isMoving = isMoving;
+		this.isPaused = isPaused;
 		this.room = room;
 		this.gold = gold;
 		this.lastTeleport = performance.now();
@@ -200,6 +203,7 @@ export namespace Player {
 		direction?: Direction;
 		room?: Room;
 		isMoving?: boolean;
+		isPaused?: boolean;
 		gold?: number;
 	}
 

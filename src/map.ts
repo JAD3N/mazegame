@@ -5,8 +5,8 @@ import seedrandom from 'seedrandom';
 
 export class RoomMap {
 
-	public static readonly WIDTH: number = 15;
-	public static readonly HEIGHT: number = 15;
+	public static readonly WIDTH: number = 5;
+	public static readonly HEIGHT: number = 5;
 
 	public readonly seed: string;
 
@@ -27,8 +27,6 @@ export class RoomMap {
 		const mazeHeight = RoomMap.HEIGHT;
 		const random = this.prng;
 
-		console.log(random());
-
 		for(let x = 0; x < mazeWidth; x++) {
 			for(let y = 0; y < mazeHeight; y++) {
 				const room = new Room({
@@ -41,12 +39,8 @@ export class RoomMap {
 			}
 		}
 
-		console.log(random());
-
 		const maze = generateMaze(mazeWidth, mazeHeight, true, random);
 		const scope = this;
-
-		console.log(random());
 
 		function addRoute(x: number, y: number, direction: Direction): void {
 			let oppositeDirection = null;

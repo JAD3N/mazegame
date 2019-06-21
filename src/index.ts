@@ -31,5 +31,5 @@ declare global {
 	// add event listener for page load
 	document.addEventListener('DOMContentLoaded', run);
 })(function() {
-	window.MazeGame = new Game();
+	(window.MazeGame = new Game()).showMainMenu();
 });
