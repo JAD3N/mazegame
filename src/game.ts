@@ -107,6 +107,8 @@ export class Game {
 		const random = this.map.prng;
 
 		this.player.room = startRoom;
+		this.player.isPaused = false;
+
 		this.player.x = random() * (startRoom.width - 2) + 1;
 		this.player.y = random() * (startRoom.height - 2) + 1;
 	}
@@ -128,6 +130,10 @@ export class Game {
 
 		try {
 			const run: () => void = (): void => {
+				if(this.state !== Game.State.PLAYING) {
+					return;
+				}
+
 				if(hasResized) {
 					hasResized = false;
 
@@ -231,7 +237,7 @@ export class Game {
 	}
 
 	public async showMainMenu(): Promise<void> {
-		this.state = Game.State.MENU;
+		this.endLevel();
 
 		const action = await this.alert('Maze Game', [
 			'Play New',
@@ -239,7 +245,14 @@ export class Game {
 		]);
 
 		if(action === 'Load Level') {
-			this.startLevel(prompt('Enter level seed:'));
+			const seed = prompt('Enter level seed:');
+
+			if(seed === null || !seed.length) {
+				this.showMainMenu();
+			} else {
+				this.startLevel(seed);
+			}
+
 		} else if(action === 'Play New') {
 			this.startLevel();
 		}
@@ -252,10 +265,11 @@ export class Game {
 
 		this.player.isPaused = true;
 		
-		const action = await this.alert('Main Menu', [
+		const action = await this.alert('Game Paused', [
 			'Restart Level',
 			'New Level',
 			'View Level Seed',
+			'Main Menu',
 			'Close'
 		]);
 
@@ -265,6 +279,9 @@ export class Game {
 			this.startLevel();
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
+		} else if(action === 'Main Menu') {
+			this.showMainMenu();
+			return;
 		}
 
 		this.player.isPaused = false;
@@ -283,6 +300,15 @@ export class Game {
 			this.startLevel();
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
+		}
+	}
+
+	private endLevel(): void {
+		if(this.state === Game.State.PLAYING) {
+			cancelAnimationFrame(this.callbackId);
+
+			this.state = Game.State.MENU;
+			this.renderer.clear();
 		}
 	}
 
