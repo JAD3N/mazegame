@@ -1,11 +1,9 @@
 import {Game} from './game';
 import {Camera} from './camera';
 import {Assets} from './assets';
-import {Treasure} from './sprites/treasure';
 import {Sprite} from './sprites/sprite';
 import {Floor} from './sprites/floor';
 import {RoomMap} from './map';
-import {Direction} from './utils/direction';
 
 export class Renderer {
 
@@ -80,15 +78,11 @@ export class Renderer {
 		// render floor
 		const room = this.game.currentRoom;
 		const player = this.game.player;
-
-		// update player
-		player.update(deltaTime);
-
 		const sprites: Sprite[] = [player];
 		
 		room.renderFloor(this);
-		room.treasure.forEach(function(treasure: Treasure) {
-			sprites.push(treasure);
+		room.sprites.forEach(function(sprite: Sprite) {
+			sprites.push(sprite);
 		});
 
 		sprites.sort(function(a: Sprite, b: Sprite) {
@@ -104,6 +98,13 @@ export class Renderer {
 				return 0;
 			}
 		}).forEach((sprite: Sprite) => {
+			sprite.update(deltaTime);
+
+			if(sprite.needsRemoval) {
+				room.sprites.delete(sprite);
+				return;
+			}
+
 			sprite.render(this);
 			
 			if(Game.DEBUG && Game.SHOW_HITBOXES && sprite.boundingBox) {
@@ -132,6 +133,8 @@ export class Renderer {
 
 				if(inRoom) {
 					ctx.fillStyle = '#ff0000';
+				} else if(room.isEnd) {
+					ctx.fillStyle = '#00ff00';
 				} else {
 					ctx.fillStyle = '#ffffff';
 				}

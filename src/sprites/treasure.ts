@@ -1,15 +1,18 @@
 import {Sprite} from './sprite';
 import {Renderer} from '../renderer';
-import { BoundingBox } from '../boundingBox';
+import {Coin} from './coin';
+import {Room} from '../room';
 
 let TEXTURE: HTMLImageElement;
 
 export class Treasure extends Sprite {
 
 	public static readonly FADE_TIME = 500;
+	public static readonly VALUE = Coin.VALUE * 5;
 
 	public stage: Treasure.Stage;
-	public opacity: number = 0.5;
+	public opacity: number;
+	public room: Room;
 
 	private fadeStart: number;
 
@@ -17,8 +20,9 @@ export class Treasure extends Sprite {
 		x = 0,
 		y = 0,
 		opacity = 1,
-		stage = Treasure.Stage.CLOSED
-	}: Treasure.Options = {}) {
+		stage = Treasure.Stage.CLOSED,
+		room
+	}: Treasure.Options) {
 		super({
 			x,
 			y,
@@ -35,6 +39,7 @@ export class Treasure extends Sprite {
 		this.opacity = opacity;
 		this.stage = stage;
 		this.fadeStart = null;
+		this.room = room;
 	}
 
 	public render(renderer: Renderer): void {
@@ -49,14 +54,14 @@ export class Treasure extends Sprite {
 		const ctx = renderer.ctx;
 		ctx.save();
 
-		if(this.stage === Treasure.Stage.HIDDEN && this.opacity > 0) {
+		if(this.stage === Treasure.Stage.HIDDEN) {
 			const now = performance.now();
 			const delta = (now - this.fadeStart);
 
 			this.opacity = 1 - Math.min(Math.max(delta / Treasure.FADE_TIME, 0), 1);
-
-			ctx.globalAlpha = this.opacity;
 		}
+
+		ctx.globalAlpha = this.opacity;
 
 		let frame = this.stage;
 		if(frame === Treasure.Stage.HIDDEN) {
@@ -113,6 +118,7 @@ export namespace Treasure {
 		y?: number;
 		opacity?: number;
 		stage?: Treasure.Stage;
+		room: Room;
 	}
 
 }

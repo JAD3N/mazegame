@@ -2,11 +2,18 @@ import {Player} from './sprites/player';
 import {Direction} from './utils/direction';
 import {Game} from './game';
 
-const KEY_W = 87;
-const KEY_A = 65;
-const KEY_S = 83;
-const KEY_D = 68;
-const KEY_H = 72;
+const KEY_W = 87; // up
+const KEY_A = 65; // left
+const KEY_S = 83; // down
+const KEY_D = 68; // right
+
+const KEY_H = 72; // debug hitboxes
+const KEY_Q = 81; // drop coin
+
+function preventEvent(event: KeyboardEvent): void {
+	event.preventDefault();
+	event.stopPropagation();
+}
 
 export class Controller {
 
@@ -25,22 +32,23 @@ export class Controller {
 		const activeKeys = this.activeKeys;
 		const keyCode = event.keyCode;
 
-		if(keyCode === KEY_W && !activeKeys.has(KEY_W)) activeKeys.add(KEY_W), event.preventDefault();
-		if(keyCode === KEY_A && !activeKeys.has(KEY_A)) activeKeys.add(KEY_A), event.preventDefault();
-		if(keyCode === KEY_S && !activeKeys.has(KEY_S)) activeKeys.add(KEY_S), event.preventDefault();
-		if(keyCode === KEY_D && !activeKeys.has(KEY_D)) activeKeys.add(KEY_D), event.preventDefault();
+		if(keyCode === KEY_W && !activeKeys.has(KEY_W)) activeKeys.add(KEY_W), preventEvent(event);
+		if(keyCode === KEY_A && !activeKeys.has(KEY_A)) activeKeys.add(KEY_A), preventEvent(event);
+		if(keyCode === KEY_S && !activeKeys.has(KEY_S)) activeKeys.add(KEY_S), preventEvent(event);
+		if(keyCode === KEY_D && !activeKeys.has(KEY_D)) activeKeys.add(KEY_D), preventEvent(event);
 
-		if(keyCode === KEY_H) Game.SHOW_HITBOXES = !Game.SHOW_HITBOXES;
+		if(keyCode === KEY_H) Game.SHOW_HITBOXES = !Game.SHOW_HITBOXES, preventEvent(event);
+		if(keyCode === KEY_Q) this.player.dropCoin(), preventEvent(event);
 	}
 
 	private onKeyUp(event: KeyboardEvent): void {
 		const activeKeys = this.activeKeys;
 		const keyCode = event.keyCode;
 
-		if(keyCode === KEY_W && activeKeys.has(KEY_W)) activeKeys.delete(KEY_W), event.preventDefault();
-		if(keyCode === KEY_A && activeKeys.has(KEY_A)) activeKeys.delete(KEY_A), event.preventDefault();
-		if(keyCode === KEY_S && activeKeys.has(KEY_S)) activeKeys.delete(KEY_S), event.preventDefault();
-		if(keyCode === KEY_D && activeKeys.has(KEY_D)) activeKeys.delete(KEY_D), event.preventDefault();
+		if(keyCode === KEY_W && activeKeys.has(KEY_W)) activeKeys.delete(KEY_W), preventEvent(event);
+		if(keyCode === KEY_A && activeKeys.has(KEY_A)) activeKeys.delete(KEY_A), preventEvent(event);
+		if(keyCode === KEY_S && activeKeys.has(KEY_S)) activeKeys.delete(KEY_S), preventEvent(event);
+		if(keyCode === KEY_D && activeKeys.has(KEY_D)) activeKeys.delete(KEY_D), preventEvent(event);
 	}
 
 	public update(): void {

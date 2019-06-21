@@ -45,7 +45,8 @@ export class Game {
 				'player-right': 'assets/textures/player-right.png',
 				'player-idle': 'assets/textures/player-idle.png',
 
-				'treasure': 'assets/textures/treasure.png'
+				'treasure': 'assets/textures/treasure.png',
+				'coin': 'assets/textures/coin.png'
 			}
 		})
 
@@ -63,7 +64,7 @@ export class Game {
 
 		this.player = new Player();
 		this.controller = new Controller(this.player);
-		
+	
 		this.generateRooms();
 
 		// start render loop
@@ -73,30 +74,15 @@ export class Game {
 	}
 
 	private generateRooms(): void {
-		const roomA = new Room({
-			width: 10,
-			height: 10
-		});
-
-		const roomB = new Room({
-			width: 5,
-			height: 5,
-
-			routes: {
-				south: roomA
-			}
-		});
-
-		roomA.addRoute(Direction.NORTH, roomB);
-
-		this.map = new RoomMap();
+		this.map = new RoomMap('randomseed');
 		this.map.generate();
 
 		const starterRoom = this.map.starterRoom;
+		const random = this.map.prng;
 
 		this.player.room = starterRoom;
-		this.player.x = Math.random() * (starterRoom.width - 2) + 1;
-		this.player.y = Math.random() * (starterRoom.height - 2) + 1;
+		this.player.x = random() * (starterRoom.width - 2) + 1;
+		this.player.y = random() * (starterRoom.height - 2) + 1;
 	}
 
 	public get currentRoom(): Room {
@@ -160,7 +146,7 @@ export class Game {
 		const gold = this.player.gold;
 		const el = document.body.querySelector('.gold-counter .qty');
 
-		el.innerHTML = (gold * 10) + '';
+		el.innerHTML = gold + '';
 	}
 
 }

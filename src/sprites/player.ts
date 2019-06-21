@@ -3,6 +3,7 @@ import {Direction} from '../utils/direction';
 import {Renderer} from '../renderer';
 import {Room} from '../room';
 import {Treasure} from './treasure';
+import { Coin } from './coin';
 
 let TEXTURE_FRONT: HTMLImageElement;
 let TEXTURE_BACK: HTMLImageElement;
@@ -91,10 +92,21 @@ export class Player extends Sprite {
 		}
 
 		if(this.room) {
-			this.room.treasure.forEach((treasure: Treasure) => {
-				if(treasure.stage === Treasure.Stage.CLOSED && this.boundingBox.hits(treasure.boundingBox)) {
-					treasure.open();
-					this.gold++;
+			this.room.sprites.forEach((sprite: Sprite) => {
+				if(sprite instanceof Treasure) {
+					const treasure = sprite;
+
+					if(treasure.stage === Treasure.Stage.CLOSED && this.boundingBox.hits(treasure.boundingBox)) {
+						treasure.open();
+						this.gold += Treasure.VALUE;
+					}
+				} else if(sprite instanceof Coin) {
+					const coin = sprite;
+
+					if(coin.canCollect && this.boundingBox.hits(coin.boundingBox)) {
+						this.gold += coin.value;
+						coin.collect();
+					}
 				}
 			});
 		}
@@ -146,6 +158,36 @@ export class Player extends Sprite {
 
 		box.width = 12 / 16;
 		box.height = 1;
+	}
+
+	public dropCoin(): void {
+		if(this.room && this.gold >= Coin.VALUE) {
+			let velocityX = 0;
+			let velocityY = 0;
+
+			switch(this.direction) {
+				case Direction.NORTH:
+					velocityY--;
+					break;
+				case Direction.SOUTH:
+					velocityY++;
+					break;
+				case Direction.EAST:
+					velocityX++;
+					break;
+				case Direction.WEST:
+					velocityX--;
+					break;
+			}
+
+			const coin = new Coin({
+				x: this.x,
+				y: this.y
+			});
+
+			this.gold -= coin.value;
+			this.room.sprites.add(coin);
+		}
 	}
 
 }

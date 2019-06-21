@@ -5,6 +5,7 @@ import {Treasure} from './sprites/treasure';
 import {Passage} from './sprites/passage';
 import {Direction} from './utils/direction';
 import {Player} from './sprites/player';
+import {RoomMap} from './map';
 
 export class Room {
 
@@ -12,18 +13,20 @@ export class Room {
 	public static readonly MAX_SIZE = 10;
 
 	public isEnd: boolean;
+	public map: RoomMap;
 
 	public width: number;
 	public height: number;
 
 	public floor: Floor;
 	public routes: Set<Room.Route>;
-	public treasure: Set<Treasure>;
+	public sprites: Set<Sprite>;
 
 	public needsUpdate: boolean;
 	private _center: Room.Center;
 
 	public constructor({
+		map,
 		width,
 		height,
 		treasureChance = 0.7,
@@ -33,32 +36,38 @@ export class Room {
 		this.width = width;
 		this.height = height;
 		this.isEnd = isEnd;
+		this.map = map;
 
 		this.floor = new Floor({width, height});
 		this.routes = new Set<Room.Route>();
-		this.treasure = new Set<Treasure>();
+		this.sprites = new Set<Sprite>();
 
 		const numTreasure = Math.min(Math.floor(width * height) / (5 * 5), 3);
+		const random = map.prng;
 
 		for(let i = 1, tries = 0; i <= numTreasure; i++) {
-			if(Math.random() <= treasureChance) {
-				let x = Math.random() * (width - 3) + 1;
-				let y = Math.random() * (height - 3) + 1;
+			if(random() <= treasureChance) {
+				let x = random() * (width - 3) + 1;
+				let y = random() * (height - 3) + 1;
 				let skip = false;
 
-				this.treasure.forEach((treasure: Treasure) => {
-					if(treasure.distanceTo(x, y) <= 3) {
-						skip = true;
-						tries++;
+				this.sprites.forEach((sprite: Sprite) => {
+					if(sprite instanceof Treasure) {
+						const treasure = sprite;
 
-						if(tries > 4) {
-							i--;
+						if(treasure.distanceTo(x, y) <= 3) {
+							skip = true;
+							tries++;
+
+							if(tries > 4) {
+								i--;
+							}
 						}
 					}
 				});
 
 				if(!skip) {
-					this.treasure.add(new Treasure({x, y}));
+					this.sprites.add(new Treasure({x, y, room: this}));
 					tries = 0;
 				}
 			}
@@ -161,8 +170,6 @@ export class Room {
 			const box = passage.teleportBox;
 			const room = route.destination;
 
-			console.log(route);
-
 			if(box.hits(player.boundingBox)) {
 				const oldRoom = player.room;
 				player.room = room;
@@ -212,6 +219,7 @@ export namespace Room {
 export namespace Room {
 
 	export interface Options {
+		map: RoomMap;
 		width: number;
 		height: number;
 		treasureChance?: number;

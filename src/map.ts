@@ -1,17 +1,23 @@
 import {Room} from './room';
-import generateMaze from 'generate-maze';
+import {generateMaze} from './generator';
 import {Direction} from './utils/direction';
+import seedrandom from 'seedrandom';
 
 export class RoomMap {
 
-	public static readonly WIDTH: number = 10;
-	public static readonly HEIGHT: number = 10;
+	public static readonly WIDTH: number = 15;
+	public static readonly HEIGHT: number = 15;
 
+	public readonly seed: string;
+
+	public prng: seedrandom.prng;
 	public rooms: Room[];
 	public starterRoom: Room;
 
-	public constructor() {
+	public constructor(seed: string) {
 		this.rooms = [];
+		this.seed = seed;
+		this.prng = seedrandom(this.seed);
 	}
 
 	public generate(): void {
@@ -19,21 +25,28 @@ export class RoomMap {
 
 		const mazeWidth = RoomMap.WIDTH;
 		const mazeHeight = RoomMap.HEIGHT;
+		const random = this.prng;
+
+		console.log(random());
 
 		for(let x = 0; x < mazeWidth; x++) {
 			for(let y = 0; y < mazeHeight; y++) {
 				const room = new Room({
-					width: Math.random() * (Room.MAX_SIZE - Room.MIN_SIZE) + Room.MIN_SIZE,
-					height: Math.random() * (Room.MAX_SIZE - Room.MIN_SIZE) + Room.MIN_SIZE
+					map: this,
+					width: random() * (Room.MAX_SIZE - Room.MIN_SIZE) + Room.MIN_SIZE,
+					height: random() * (Room.MAX_SIZE - Room.MIN_SIZE) + Room.MIN_SIZE
 				});
 
 				this.setRoom(x, y, room);
-				this.starterRoom = room;
 			}
 		}
 
-		const maze = generateMaze(mazeWidth, mazeHeight);
+		console.log(random());
+
+		const maze = generateMaze(mazeWidth, mazeHeight, true, random);
 		const scope = this;
+
+		console.log(random());
 
 		function addRoute(x: number, y: number, direction: Direction): void {
 			let oppositeDirection = null;
@@ -80,6 +93,12 @@ export class RoomMap {
 				if(!cell.left) addRoute(x, y, Direction.WEST);
 			}
 		}
+
+		const starterRoom = Math.ceil(random() * this.rooms.length);
+		const endRoom = Math.ceil(random() * this.rooms.length);
+
+		this.starterRoom = this.rooms[starterRoom];
+		this.rooms[endRoom].isEnd = true;
 	}
 
 	public getRoom(x: number, y: number): Room {

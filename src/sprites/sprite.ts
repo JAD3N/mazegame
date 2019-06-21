@@ -17,6 +17,8 @@ export abstract class Sprite {
 
 	public boundingBox: BoundingBox;
 
+	public needsRemoval: boolean;
+
 	public constructor({
 		x = 0,
 		y = 0,
@@ -37,6 +39,8 @@ export abstract class Sprite {
 
 		this.velocityX = 0;
 		this.velocityY = 0;
+
+		this.needsRemoval = false;
 
 		if(boundingBox instanceof BoundingBox) {
 			this.boundingBox = boundingBox;
