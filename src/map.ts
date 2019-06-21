@@ -2,12 +2,14 @@ import {Room} from './room';
 import {generateMaze} from './generator';
 import {Direction} from './utils/direction';
 import seedrandom from 'seedrandom';
+import {Game} from './game';
 
 export class RoomMap {
 
 	public static readonly WIDTH: number = 8;
 	public static readonly HEIGHT: number = 8;
 
+	public readonly game: Game;
 	public readonly seed: string;
 
 	public prng: seedrandom.prng;
@@ -16,7 +18,8 @@ export class RoomMap {
 	public startRoom: Room;
 	public endRoom: Room;
 
-	public constructor(seed: string) {
+	public constructor(game: Game, seed: string) {
+		this.game = game;
 		this.rooms = [];
 		this.seed = seed;
 		this.prng = seedrandom(this.seed);
@@ -95,8 +98,6 @@ export class RoomMap {
 		do {
 			startRoom = Math.floor(random() * this.rooms.length);
 			endRoom = Math.floor(random() * this.rooms.length);
-
-			console.log(startRoom, endRoom);
 		} while(startRoom === endRoom);
 
 		this.startRoom = this.rooms[startRoom];

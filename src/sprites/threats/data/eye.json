@@ -1,0 +1,22 @@
+{
+	"spawnChance": 0.1,
+	"alerts": [
+		{
+			"message": "Oh no, you've encountered a troll! What will you do?",
+			"actions": [
+				{
+					"text": "Use club.",
+					"isCorrect": true
+				},
+				{
+					"text": "Punch it.",
+					"isCorrect": false
+				},
+				{
+					"text": "Try to reason with it.",
+					"isCorrect": false
+				}
+			]
+		}
+	]
+}

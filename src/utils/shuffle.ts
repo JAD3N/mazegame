@@ -16,7 +16,7 @@ export function shuffle<T>(arr: T[], random: seedrandom.prng | (() => number) = 
 	while(++index < length) {
 		const rand = index + Math.floor(random() * (lastIndex - index + 1));
 		const value = result[rand];
-		
+
 		result[rand] = result[index];
 		result[index] = value;
 	}
@@ -34,7 +34,7 @@ export function sortShuffle<T>(arr: T[], random: seedrandom.prng | (() => number
 
 		return true;
 	}).sort().value();
-	
+
 	for(let i = numUndefined; i > 0; i--) {
 		result.push(undefined);
 	}

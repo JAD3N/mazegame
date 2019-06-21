@@ -65,7 +65,7 @@ export abstract class Sprite {
 		ctx.drawImage(
 			// what to render
 			texture,
-			
+
 			// where in the texture to render
 			region.x, region.y,
 			region.width, region.height,
@@ -86,13 +86,6 @@ export abstract class Sprite {
 		if(this.boundingBox) {
 			this.updateBoundingBox();
 		}
-	}
-
-	public distanceTo(x: number, y: number): number {
-		return Math.sqrt(
-			((this.x - x) ** 2) +
-			((this.y - y) ** 2)
-		);
 	}
 
 	public updateBoundingBox(): void {

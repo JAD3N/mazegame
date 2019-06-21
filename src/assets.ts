@@ -32,7 +32,7 @@ export class Assets {
 	private loadImage(src: string): Promise<HTMLImageElement> {
 		return new Promise<HTMLImageElement>((resolve: (image: HTMLImageElement) => void, reject: (err: any) => void) => {
 			const image = new Image();
-			
+
 			image.addEventListener('load', () => resolve(image));
 			image.addEventListener('error', () => reject('Error loading texture!'));
 

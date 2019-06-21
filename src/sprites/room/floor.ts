@@ -1,6 +1,6 @@
-import {Sprite} from './sprite';
-import {Renderer} from '../renderer';
-import {BoundingBox} from '../boundingBox';
+import {Sprite} from '../sprite';
+import {Renderer} from '../../renderer';
+import {BoundingBox} from '../../boundingBox';
 
 export class Floor extends Sprite {
 
@@ -23,7 +23,7 @@ export class Floor extends Sprite {
 			this.height
 		);
 	}
-	
+
 }
 
 export namespace Floor {

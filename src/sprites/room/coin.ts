@@ -1,6 +1,6 @@
-import {Sprite} from './sprite';
-import {Renderer} from '../renderer';
-import {BoundingBox} from '../boundingBox';
+import {Sprite} from '../sprite';
+import {Renderer} from '../../renderer';
+import {BoundingBox} from '../../boundingBox';
 
 let TEXTURE: HTMLImageElement;
 
@@ -75,7 +75,7 @@ export class Coin extends Sprite {
 
 		ctx.restore();
 	}
-	
+
 	public updateBoundingBox(): void {
 		const box = this.boundingBox;
 

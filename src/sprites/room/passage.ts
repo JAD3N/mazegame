@@ -1,8 +1,8 @@
-import {Sprite} from './sprite';
-import {Renderer} from '../renderer';
-import {Direction} from '../utils/direction';
-import {Room} from '../room';
-import {BoundingBox} from '../boundingBox';
+import {Sprite} from '../sprite';
+import {Renderer} from '../../renderer';
+import {Direction} from '../../utils/direction';
+import {Room} from '../../room';
+import {BoundingBox} from '../../boundingBox';
 
 export class Passage extends Sprite {
 
@@ -18,7 +18,7 @@ export class Passage extends Sprite {
 	public constructor({room, direction}: Passage.Options) {
 		const width = direction % 2 === 0 ? 2 : 3;
 		const height = direction % 2 === 0 ? 3 : 2;
-		
+
 		let x = 0,
 			y = 0,
 			offsetX = 0,
@@ -44,7 +44,7 @@ export class Passage extends Sprite {
 				teleportBox = new BoundingBox({
 					x: boundingBox.x,
 					y: boundingBox.y,
-					
+
 					width: boundingBox.width,
 					height: Passage.TELEPORT_BOX_SIZE
 				});
@@ -120,10 +120,10 @@ export class Passage extends Sprite {
 		super({
 			x,
 			y,
-			
+
 			offsetX,
 			offsetY,
-			
+
 			width,
 			height,
 
@@ -137,7 +137,7 @@ export class Passage extends Sprite {
 
 	public render(renderer: Renderer): void {
 		const ctx = renderer.ctx;
-		
+
 		if(!this.gradient) {
 			let gradient;
 
@@ -187,7 +187,7 @@ export class Passage extends Sprite {
 			this.height
 		);
 	}
-	
+
 }
 
 export namespace Passage {

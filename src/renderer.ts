@@ -2,9 +2,9 @@ import {Game} from './game';
 import {Camera} from './camera';
 import {Assets} from './assets';
 import {Sprite} from './sprites/sprite';
-import {Floor} from './sprites/floor';
+import {Floor} from './sprites/room/floor';
 import {RoomMap} from './map';
-import { Direction } from './utils/direction';
+import {Direction} from './utils/direction';
 
 export class Renderer {
 
@@ -13,7 +13,7 @@ export class Renderer {
 	public readonly game: Game;
 	public readonly canvas: HTMLCanvasElement;
 	public readonly ctx: CanvasRenderingContext2D;
-	
+
 	public lastRender: number;
 
 	public constructor(game: Game) {
@@ -65,7 +65,7 @@ export class Renderer {
 
 		ctx.imageSmoothingEnabled = false;
 		ctx.save();
-	
+
 		const minSize = Math.min(width, height);
 		const tileSize = minSize / Renderer.VIEWPORT_TILES | 0;
 
@@ -83,7 +83,7 @@ export class Renderer {
 		const room = this.game.currentRoom;
 		const player = this.game.player;
 		const sprites: Sprite[] = [player];
-		
+
 		room.renderFloor(this);
 		room.sprites.forEach(function(sprite: Sprite) {
 			sprites.push(sprite);
@@ -110,7 +110,7 @@ export class Renderer {
 			}
 
 			sprite.render(this);
-			
+
 			if(Game.DEBUG && Game.SHOW_HITBOXES && sprite.boundingBox) {
 				const box = sprite.boundingBox;
 
@@ -125,51 +125,53 @@ export class Renderer {
 
 		ctx.restore();
 
-		const mapSize = 15;
-		const mapOffsetX = 50;
-		const mapOffsetY = 100;
-		const map = this.game.map;
-		
-		for(let x = 0; x < RoomMap.WIDTH; x++) {
-			for(let y = 0; y < RoomMap.HEIGHT; y++) {
-				const room = map.getRoom(x, y);
-				const inRoom = this.game.currentRoom === room;
+		if(Game.SHOW_MAP) {
+			const mapSize = 15;
+			const mapOffsetX = 50;
+			const mapOffsetY = 100;
+			const map = this.game.map;
 
-				if(inRoom) {
-					ctx.fillStyle = '#ff0000';
-				} else if(room.isEnd) {
-					ctx.fillStyle = '#00ff00';
-				} else {
-					ctx.fillStyle = '#ffffff';
-				}
+			for(let x = 0; x < RoomMap.WIDTH; x++) {
+				for(let y = 0; y < RoomMap.HEIGHT; y++) {
+					const room = map.getRoom(x, y);
+					const inRoom = this.game.currentRoom === room;
 
-				const tileX = x * mapSize;
-				const tileY = y * mapSize;
+					if(inRoom) {
+						ctx.fillStyle = '#ff0000';
+					} else if(room.isEnd) {
+						ctx.fillStyle = '#00ff00';
+					} else {
+						ctx.fillStyle = '#ffffff';
+					}
 
-				ctx.globalAlpha = 0.5;
-				ctx.fillRect(
-					tileX + mapOffsetX,
-					tileY + mapOffsetY,
-					mapSize,
-					mapSize
-				);
-				
-				if(!room.hasRoute(Direction.NORTH)) {
+					const tileX = x * mapSize;
+					const tileY = y * mapSize;
+
+					ctx.globalAlpha = 0.5;
 					ctx.fillRect(
 						tileX + mapOffsetX,
 						tileY + mapOffsetY,
 						mapSize,
-						2
-					);
-				}
-
-				if(!room.hasRoute(Direction.WEST)) {
-					ctx.fillRect(
-						tileX + mapOffsetX,
-						tileY + mapOffsetY,
-						2,
 						mapSize
 					);
+
+					if(!room.hasRoute(Direction.NORTH)) {
+						ctx.fillRect(
+							tileX + mapOffsetX,
+							tileY + mapOffsetY,
+							mapSize,
+							2
+						);
+					}
+
+					if(!room.hasRoute(Direction.WEST)) {
+						ctx.fillRect(
+							tileX + mapOffsetX,
+							tileY + mapOffsetY,
+							2,
+							mapSize
+						);
+					}
 				}
 			}
 		}

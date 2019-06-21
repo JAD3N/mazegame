@@ -36,7 +36,7 @@ function populateMissingSets(row: Box[], random: seedrandom.prng | (() => number
 
 	const allSets = _.range(1, row.length + 1);
 	const availableSets = shuffle(_.chain(allSets).difference(setsInUse).value(), random);
-	
+
 	noSets.forEach((box: Box, i: number) => box.set = availableSets[i]);
 }
 
@@ -61,9 +61,9 @@ function addSetExits(row: Box[], nextRow: Box[], random: seedrandom.prng | (() =
 		.groupBy('set')
 		.values()
 		.value();
-	
+
 	setsInRow.forEach((set: Box[]) => {
-		const exits = sampleSize(set, Math.ceil(random() * set.length));
+		const exits = sampleSize(set, Math.ceil(random() * set.length), random);
 		exits.forEach((exit: Box) => {
 			if(exit) {
 				const below = nextRow[exit.x];

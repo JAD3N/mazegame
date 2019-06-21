@@ -1,7 +1,7 @@
-import {Sprite} from './sprite';
-import {Renderer} from '../renderer';
+import {Sprite} from '../sprite';
+import {Renderer} from '../../renderer';
 import {Coin} from './coin';
-import {Room} from '../room';
+import {Room} from '../../room';
 
 let TEXTURE: HTMLImageElement;
 
@@ -26,10 +26,10 @@ export class Treasure extends Sprite {
 		super({
 			x,
 			y,
-			
+
 			offsetX: 0,
 			offsetY: -1,
-			
+
 			width: 1,
 			height: 1,
 
@@ -46,7 +46,7 @@ export class Treasure extends Sprite {
 		if(this.opacity === 0) {
 			return;
 		}
-		
+
 		if(!TEXTURE) {
 			TEXTURE = renderer.assets.getTexture('treasure');
 		}
@@ -96,12 +96,12 @@ export class Treasure extends Sprite {
 		const box = this.boundingBox;
 
 		box.x = this.x + this.offsetX;
-		box.y = this.y + this.offsetY + 0.5;
+		box.y = this.y + this.offsetY + 2 / 16;
 
 		box.width = 1;
-		box.height = 0.5;
+		box.height = 14 / 16;
 	}
-	
+
 }
 
 export namespace Treasure {

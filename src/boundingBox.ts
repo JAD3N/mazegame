@@ -1,7 +1,3 @@
-import {Room} from './room';
-import { runInNewContext } from 'vm';
-
-
 export class BoundingBox {
 
 	public x: number;

@@ -26,8 +26,9 @@ function randomString(length: number = 8): string {
 
 export class Game {
 
-	public static DEBUG: boolean = true;
-	public static SHOW_HITBOXES: boolean = false;
+	public static DEBUG = true;
+	public static SHOW_HITBOXES = false;
+	public static SHOW_MAP = false;
 
 	public readonly renderer: Renderer;
 	public readonly camera: Camera;
@@ -66,12 +67,10 @@ export class Game {
 				'parasite': 'assets/textures/parasite.png',
 				'eye': 'assets/textures/eye.png'
 			}
-		})
-
-		this.start();
+		});
 	}
 
-	private async start(): Promise<void> {
+	public async load(): Promise<void> {
 		await this.assets.load();
 
 		// add canvas to page
@@ -82,11 +81,11 @@ export class Game {
 			this.showStats = true;
 		}
 
-		this.player = new Player();
+		this.player = new Player({game: this});
 		this.controller = new Controller(this);
 	}
 
-	public startLevel(seed: string = undefined): void {
+	public loadLevel(seed: string = undefined): void {
 		if(seed === undefined) {
 			seed = randomString(8);
 		}
@@ -94,13 +93,13 @@ export class Game {
 		if(this.state === Game.State.PLAYING) {
 			cancelAnimationFrame(this.callbackId);
 		}
-	
+
 		this.generateRooms(seed);
 		this.loop();
 	}
 
 	private generateRooms(seed: string): void {
-		this.map = new RoomMap(seed);
+		this.map = new RoomMap(this, seed);
 		this.map.generate();
 
 		const startRoom = this.map.startRoom;
@@ -153,12 +152,9 @@ export class Game {
 				}
 
 				if(this.player.room.isEnd) {
-					this.state = Game.State.WON;
-					
 					this.showWonMenu();
 					this.updateGoldCounter();
-					this.renderer.clear();
-					
+
 					return;
 				}
 
@@ -220,7 +216,7 @@ export class Game {
 			while(actionsEl.firstChild) {
 				actionsEl.removeChild(actionsEl.firstChild);
 			}
-			
+
 			for(let action of actions) {
 				const actionEl = document.createElement('li');
 
@@ -236,7 +232,16 @@ export class Game {
 		});
 	}
 
+	public hideAlert(): void {
+		const el = document.querySelector('.alert');
+
+		if(el.classList.contains('hidden')) {
+			el.classList.remove('hidden');
+		}
+	}
+
 	public async showMainMenu(): Promise<void> {
+		this.state = Game.State.MENU;
 		this.endLevel();
 
 		const action = await this.alert('Maze Game', [
@@ -250,11 +255,10 @@ export class Game {
 			if(seed === null || !seed.length) {
 				this.showMainMenu();
 			} else {
-				this.startLevel(seed);
+				this.loadLevel(seed);
 			}
-
 		} else if(action === 'Play New') {
-			this.startLevel();
+			this.loadLevel();
 		}
 	}
 
@@ -264,19 +268,19 @@ export class Game {
 		}
 
 		this.player.isPaused = true;
-		
+
 		const action = await this.alert('Game Paused', [
+			'Resume',
 			'Restart Level',
 			'New Level',
 			'View Level Seed',
-			'Main Menu',
-			'Close'
+			'Main Menu'
 		]);
 
 		if(action === 'Restart Level') {
-			this.startLevel(this.map.seed);
+			this.loadLevel(this.map.seed);
 		} else if(action === 'New Level') {
-			this.startLevel();
+			this.loadLevel();
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
 		} else if(action === 'Main Menu') {
@@ -288,6 +292,9 @@ export class Game {
 	}
 
 	public async showWonMenu(): Promise<void> {
+		this.state = Game.State.WON;
+		this.endLevel();
+
 		const action = await this.alert('You Win!', [
 			'Restart Level',
 			'New Level',
@@ -295,21 +302,43 @@ export class Game {
 		]);
 
 		if(action === 'Restart Level') {
-			this.startLevel(this.map.seed);
+			this.loadLevel(this.map.seed);
 		} else if(action === 'New Level') {
-			this.startLevel();
+			this.loadLevel();
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
+			this.showWonMenu();
+		}
+	}
+
+	public async showDeathMenu(): Promise<void> {
+		this.state = Game.State.DEAD;
+		this.endLevel();
+
+		const action = await this.alert('You Lost!', [
+			'Restart Level',
+			'New Level',
+			'VIew Level Seed'
+		]);
+
+		if(action === 'Restart Level') {
+			this.loadLevel(this.map.seed);
+		} else if(action === 'New Level') {
+			this.loadLevel();
+		} else if(action === 'View Level Seed') {
+			prompt('Level Seed:', this.map.seed);
+			this.showWonMenu();
 		}
 	}
 
 	private endLevel(): void {
-		if(this.state === Game.State.PLAYING) {
+		if(this.callbackId) {
 			cancelAnimationFrame(this.callbackId);
-
-			this.state = Game.State.MENU;
-			this.renderer.clear();
 		}
+
+		this.renderer.clear();
+		this.updateGoldCounter();
+		this.callbackId = null;
 	}
 
 }

@@ -13,9 +13,6 @@
 		"resolveJsonModule": true,
 		"esModuleInterop": true
 	},
-	"files": [
-		"./typings/generate-maze.d.ts"
-	],
 	"include": [
 		"./src/**/*"
 	]

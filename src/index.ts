@@ -30,6 +30,20 @@ declare global {
 
 	// add event listener for page load
 	document.addEventListener('DOMContentLoaded', run);
-})(function() {
-	(window.MazeGame = new Game()).showMainMenu();
+})(async function() {
+	const game = window.MazeGame = new Game();
+
+	await game.load();
+
+	if(location.hash) {
+		const seed = location.hash.slice(1);
+
+		if(seed && seed.length) {
+			game.loadLevel(seed);
+		}
+
+		return;
+	}
+
+	game.showMainMenu();
 });

@@ -1,11 +1,15 @@
-import {Floor} from './sprites/floor';
+import {Floor} from './sprites/room/floor';
 import {Renderer} from './renderer';
 import {Sprite} from './sprites/sprite';
-import {Treasure} from './sprites/treasure';
-import {Passage} from './sprites/passage';
+import {Treasure} from './sprites/room/treasure';
+import {Passage} from './sprites/room/passage';
 import {Direction} from './utils/direction';
 import {Player} from './sprites/player';
 import {RoomMap} from './map';
+import {Troll} from './sprites/threats/troll';
+import {Parasite} from './sprites/threats/parasite';
+import {Eye} from './sprites/threats/eye';
+import {distance} from './utils/math';
 
 export class Room {
 
@@ -56,7 +60,7 @@ export class Room {
 					if(sprite instanceof Treasure) {
 						const treasure = sprite;
 
-						if(treasure.distanceTo(x, y) <= 3) {
+						if(distance(treasure.x, treasure.y, x, y) <= 3) {
 							skip = true;
 							tries++;
 
@@ -74,17 +78,34 @@ export class Room {
 			}
 		}
 
-		/*this.sprites.add(new Troll({
-			x: this.center.x,
-			y: this.center.y + 0.9,
-		}));
-		this.isLocked = true;*/
+		if(random() <= Troll.SPAWN_CHANCE){
+			this.isLocked = true;
+			this.sprites.add(new Troll({
+				room: this,
+				x: this.center.x,
+				y: this.center.y + 0.9
+			}));
+		} else if(random() <= Parasite.SPAWN_CHANCE) {
+			this.isLocked = true;
+			this.sprites.add(new Parasite({
+				room: this,
+				x: this.center.x,
+				y: this.center.y + 0.9
+			}));
+		} else if(random() <= Eye.SPAWN_CHANCE) {
+			this.isLocked = true;
+			this.sprites.add(new Eye({
+				room: this,
+				x: this.center.x,
+				y: this.center.y + 0.9
+			}));
+		}
 
 		if(routes.north) this.addRoute(Direction.NORTH, routes.north);
 		if(routes.east) this.addRoute(Direction.EAST, routes.east);
 		if(routes.south) this.addRoute(Direction.SOUTH, routes.south);
 		if(routes.west) this.addRoute(Direction.WEST, routes.west);
-		
+
 		this.needsUpdate = true;
 		this._center = null;
 	}
@@ -180,7 +201,9 @@ export class Room {
 				if(this.isLocked) {
 					if(!passage.isInside) {
 						passage.isInside = true;
-						alert('You cannot leave until you have defeated the threat.');
+
+						const game = this.map.game;
+						game.alert('You cannot leave until you have defeated the threat.', ['Close']);
 					}
 
 					return;
