@@ -4,7 +4,6 @@ import {Direction} from './utils/direction';
 import seedrandom from 'seedrandom';
 import {Game} from './game';
 import {distance} from './utils/math';
-import { start } from 'repl';
 
 export interface Position {
 	x: number;
