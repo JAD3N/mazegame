@@ -260,23 +260,27 @@ export class Game {
 		const action = await this.alert('Maze Game', [
 			'Play New',
 			'Load Level',
-			'How To Play'
+			'How To Play',
+			'Credits'
 		]);
 
 		if(action === 'Play New') {
 			this.loadLevel();
+			return;
 		} else if(action === 'Load Level') {
 			const seed = prompt('Enter level seed:');
 
-			if(seed === null || !seed.length) {
-				this.showMainMenu();
-			} else {
+			if(seed !== null && seed.length) {
 				this.loadLevel(seed);
+				return;
 			}
 		} else if(action === 'How To Play') {
 			await this.showInstructionsMenu();
-			this.showMainMenu();
+		} else if(action === 'Credits') {
+			await this.showCreditsMenu();
 		}
+
+		this.showMainMenu();
 	}
 
 	public async showPauseMenu(): Promise<void> {
@@ -397,6 +401,10 @@ export class Game {
 				this.player.isPaused = false;
 			}
 		}
+	}
+
+	public async showCreditsMenu(): Promise<void> {
+		await this.alert('This game was created by Jaden Buchan.', ['Close']);
 	}
 
 	private endLevel(): void {
