@@ -125,7 +125,7 @@ export class Renderer {
 
 		ctx.restore();
 
-		if(Game.SHOW_MAP) {
+		if(Game.DEBUG && Game.SHOW_MAP) {
 			const mapSize = 15;
 			const mapOffsetX = 50;
 			const mapOffsetY = 100;

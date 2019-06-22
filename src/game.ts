@@ -79,6 +79,8 @@ export class Game {
 		document.body.appendChild(this.renderer.canvas);
 		document.body.appendChild(this.stats.dom);
 
+		this.stats.dom.classList.add('hidden');
+
 		this.player = new Player({game: this});
 		this.controller = new Controller(this);
 	}
