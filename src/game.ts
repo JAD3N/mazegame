@@ -259,10 +259,13 @@ export class Game {
 
 		const action = await this.alert('Maze Game', [
 			'Play New',
-			'Load Level'
+			'Load Level',
+			'How To Play'
 		]);
 
-		if(action === 'Load Level') {
+		if(action === 'Play New') {
+			this.loadLevel();
+		} else if(action === 'Load Level') {
 			const seed = prompt('Enter level seed:');
 
 			if(seed === null || !seed.length) {
@@ -270,8 +273,9 @@ export class Game {
 			} else {
 				this.loadLevel(seed);
 			}
-		} else if(action === 'Play New') {
-			this.loadLevel();
+		} else if(action === 'How To Play') {
+			await this.showInstructionsMenu();
+			this.showMainMenu();
 		}
 	}
 
@@ -288,6 +292,7 @@ export class Game {
 			'Restart Level',
 			'New Level',
 			'View Level Seed',
+			'How To Play',
 			'Main Menu'
 		]);
 
@@ -301,9 +306,11 @@ export class Game {
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
 			this.showPauseMenu();
+		} else if(action === 'How To Play') {
+			await this.showInstructionsMenu();
+			this.showPauseMenu();
 		} else if(action === 'Main Menu') {
 			this.showMainMenu();
-			return;
 		}
 	}
 
@@ -344,6 +351,51 @@ export class Game {
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
 			this.showDeathMenu();
+		}
+	}
+
+	public async showInstructionsMenu(stage: number = 0): Promise<void> {
+		if(this.state === Game.State.PLAYING) {
+			this.isPaused = true;
+			this.player.isPaused = true;
+		}
+
+		// predefined actions
+		const actions = [
+			'Next',
+			'Close'
+		];
+
+		let action;
+
+		switch(stage) {
+			case 0:
+				action = await this.alert('You can use WASD to move your character in the room.', actions);
+				break;
+			case 1:
+				action = await this.alert('You can drop gold by pressing Q on your keyboard.', actions);
+				break;
+			case 2:
+				action = await this.alert('Threats can be defeated by certain choices.', actions);
+				break;
+			case 3:
+				action = await this.alert('If you choose incorrectly, you will lose some gold or die if you don\'t have enough.', actions);
+				break;
+			case 4:
+				action = await this.alert('You can pick up gold coins or loot treasure chests.', actions);
+				break;
+			case 5:
+				action = await this.alert('The maze is beat when you find the escape passage. Have fun!', ['Close']);
+				break;
+		}
+
+		if(action === 'Next') {
+			await this.showInstructionsMenu(stage + 1);
+		} else if(action === 'Close') {
+			if(this.state === Game.State.PLAYING) {
+				this.isPaused = false;
+				this.player.isPaused = false;
+			}
 		}
 	}
 
