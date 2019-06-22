@@ -13,8 +13,8 @@ export interface Position {
 
 export class RoomMap {
 
-	public static readonly WIDTH: number = 12;
-	public static readonly HEIGHT: number = 12;
+	public static readonly WIDTH: number = 8;
+	public static readonly HEIGHT: number = 8;
 
 	public readonly game: Game;
 	public readonly seed: string;
