@@ -27,7 +27,7 @@ function randomString(length: number = 8): string {
 
 export class Game {
 
-	public static DEBUG = true;
+	public static DEBUG = false;
 	public static SHOW_HITBOXES = false;
 	public static SHOW_MAP = false;
 
