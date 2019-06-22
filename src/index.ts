@@ -22,11 +22,11 @@ declare global {
 	}
 
 	// manually check
-	const id: number = setInterval(function() {
+	const id: number = window.setInterval(function() {
 		if(document.readyState === 'complete') {
 			run();
 		}
-	});
+	}, 100);
 
 	// add event listener for page load
 	document.addEventListener('DOMContentLoaded', run);
