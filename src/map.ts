@@ -3,11 +3,18 @@ import {generateMaze} from './generator';
 import {Direction} from './utils/direction';
 import seedrandom from 'seedrandom';
 import {Game} from './game';
+import {distance} from './utils/math';
+import { start } from 'repl';
+
+export interface Position {
+	x: number;
+	y: number;
+}
 
 export class RoomMap {
 
-	public static readonly WIDTH: number = 8;
-	public static readonly HEIGHT: number = 8;
+	public static readonly WIDTH: number = 12;
+	public static readonly HEIGHT: number = 12;
 
 	public readonly game: Game;
 	public readonly seed: string;
@@ -93,15 +100,27 @@ export class RoomMap {
 			}
 		}
 
-		let startRoom, endRoom;
+		let startRoom: Position;
+		let endRoom: Position;
+
+		function randomPosition(): Position {
+			const index = Math.floor(random() * mazeWidth * mazeHeight);
+
+			const x = index % mazeWidth;
+			const y = (index - x) / mazeWidth;
+
+			return {x, y};
+		}
 
 		do {
-			startRoom = Math.floor(random() * this.rooms.length);
-			endRoom = Math.floor(random() * this.rooms.length);
-		} while(startRoom === endRoom);
+			startRoom = randomPosition();
+			endRoom = randomPosition();
+		} while(distance(startRoom.x, startRoom.y, endRoom.x, endRoom.y) <= mazeWidth);
 
-		this.startRoom = this.rooms[startRoom];
-		this.endRoom = this.rooms[endRoom];
+		this.startRoom = this.getRoom(startRoom.x, startRoom.y);
+		this.startRoom.removeThreats();
+
+		this.endRoom = this.getRoom(endRoom.x, endRoom.y);
 		this.endRoom.isEnd = true;
 	}
 

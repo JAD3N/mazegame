@@ -2,21 +2,56 @@
 	"spawnChance": 0.1,
 	"alerts": [
 		{
-			"message": "Oh no, you've encountered a troll! What will you do?",
+			"message": "You have run into a demonic eye! What will you do?",
 			"actions": [
 				{
-					"text": "Use club.",
-					"isCorrect": true
-				},
-				{
-					"text": "Punch it.",
+					"text": "Poke it with a spear.",
 					"isCorrect": false
 				},
 				{
-					"text": "Try to reason with it.",
+					"text": "Throw rocks at it.",
+					"isCorrect": true
+				},
+				{
+					"text": "Run into it.",
+					"isCorrect": false
+				}
+			]
+		},
+		{
+			"message": "You have been caught by a demonic eye! How will you defend yourself?",
+			"actions": [
+				{
+					"text": "Use a shield.",
+					"isCorrect": true
+				},
+				{
+					"text": "Run away.",
+					"isCorrect": false
+				},
+				{
+					"text": "Attack with a sword.",
+					"isCorrect": false
+				}
+			]
+		},
+		{
+			"message": "The demonic eye has seen you. What weapon do you use?",
+			"actions": [
+				{
+					"text": "A sword.",
+					"isCorrect": false
+				},
+				{
+					"text": "Rocks.",
+					"isCorrect": true
+				},
+				{
+					"text": "No weapon.",
 					"isCorrect": false
 				}
 			]
 		}
 	]
 }
+

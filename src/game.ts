@@ -5,6 +5,7 @@ import {Player} from './sprites/player';
 import {Controller} from './controller';
 import {Room} from './room';
 import {RoomMap} from './map';
+import {humanTime} from './utils/time';
 
 declare global {
 	class Stats {
@@ -40,9 +41,10 @@ export class Game {
 
 	public state: Game.State;
 	public stats: Stats;
-	public showStats: boolean;
+	public isPaused: boolean;
 
 	private callbackId: number;
+	private time: number;
 
 	public constructor() {
 		this.state = Game.State.MENU;
@@ -77,10 +79,6 @@ export class Game {
 		document.body.appendChild(this.renderer.canvas);
 		document.body.appendChild(this.stats.dom);
 
-		if(Game.DEBUG) {
-			this.showStats = true;
-		}
-
 		this.player = new Player({game: this});
 		this.controller = new Controller(this);
 	}
@@ -93,6 +91,12 @@ export class Game {
 		if(this.state === Game.State.PLAYING) {
 			cancelAnimationFrame(this.callbackId);
 		}
+
+		this.time = 0;
+		this.isPaused = false;
+
+		this.player.isPaused = false;
+		this.player.gold = 0;
 
 		this.generateRooms(seed);
 		this.loop();
@@ -153,18 +157,21 @@ export class Game {
 
 				if(this.player.room.isEnd) {
 					this.showWonMenu();
-					this.updateGoldCounter();
-
 					return;
 				}
 
 				this.camera.update();
 				this.currentRoom.update(this.player);
-				this.renderer.render(this.camera);
 
-				this.updateGoldCounter();
+				const deltaTime = this.renderer.render(this.camera);
 
-				if(this.showStats) {
+				if(!this.isPaused) {
+					this.time += deltaTime;
+				}
+
+				this.updateStats();
+
+				if(Game.DEBUG) {
 					this.stats.update();
 					this.stats.dom.style.display = 'block';
 				} else {
@@ -175,27 +182,33 @@ export class Game {
 				this.callbackId = requestAnimationFrame(run);
 			}
 
-			run();
+			requestAnimationFrame(run);
 		} catch(err) {
 			alert('Render error!');
 		}
 	}
 
-	public updateGoldCounter(): void {
-		const el = document.body.querySelector('.gold-counter');
+	public updateStats(): void {
+		const statsEl = document.body.querySelector('.stats');
+		const goldEl = statsEl.querySelector('.gold');
+		const timerEl = statsEl.querySelector('.timer');
 
 		if(this.state === Game.State.PLAYING) {
 			const gold = this.player.gold;
-			const qty = el.querySelector('.qty');
+			const time = humanTime(this.time);
 
-			qty.innerHTML = gold + '';
+			const qtyEl = goldEl.querySelector('.qty');
+			const timeEl = timerEl.querySelector('.time');
 
-			if(el.classList.contains('hidden')) {
-				el.classList.remove('hidden');
+			qtyEl.textContent = gold + '';
+			timeEl.textContent = time + '';
+
+			if(statsEl.classList.contains('hidden')) {
+				statsEl.classList.remove('hidden');
 			}
 		} else {
-			if(!el.classList.contains('hidden')) {
-				el.classList.add('hidden');
+			if(!statsEl.classList.contains('hidden')) {
+				statsEl.classList.add('hidden');
 			}
 		}
 	}
@@ -235,8 +248,8 @@ export class Game {
 	public hideAlert(): void {
 		const el = document.querySelector('.alert');
 
-		if(el.classList.contains('hidden')) {
-			el.classList.remove('hidden');
+		if(!el.classList.contains('hidden')) {
+			el.classList.add('hidden');
 		}
 	}
 
@@ -267,6 +280,7 @@ export class Game {
 			return;
 		}
 
+		this.isPaused = true;
 		this.player.isPaused = true;
 
 		const action = await this.alert('Game Paused', [
@@ -277,25 +291,27 @@ export class Game {
 			'Main Menu'
 		]);
 
+		this.isPaused = false;
+		this.player.isPaused = false;
+
 		if(action === 'Restart Level') {
 			this.loadLevel(this.map.seed);
 		} else if(action === 'New Level') {
 			this.loadLevel();
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
+			this.showPauseMenu();
 		} else if(action === 'Main Menu') {
 			this.showMainMenu();
 			return;
 		}
-
-		this.player.isPaused = false;
 	}
 
 	public async showWonMenu(): Promise<void> {
 		this.state = Game.State.WON;
 		this.endLevel();
 
-		const action = await this.alert('You Win!', [
+		const action = await this.alert(`You Win! (${this.player.gold} gold, ${humanTime(this.time)})`, [
 			'Restart Level',
 			'New Level',
 			'View Level Seed'
@@ -318,7 +334,7 @@ export class Game {
 		const action = await this.alert('You Lost!', [
 			'Restart Level',
 			'New Level',
-			'VIew Level Seed'
+			'View Level Seed'
 		]);
 
 		if(action === 'Restart Level') {
@@ -327,7 +343,7 @@ export class Game {
 			this.loadLevel();
 		} else if(action === 'View Level Seed') {
 			prompt('Level Seed:', this.map.seed);
-			this.showWonMenu();
+			this.showDeathMenu();
 		}
 	}
 
@@ -337,7 +353,7 @@ export class Game {
 		}
 
 		this.renderer.clear();
-		this.updateGoldCounter();
+		this.updateStats();
 		this.callbackId = null;
 	}
 

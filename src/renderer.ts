@@ -46,7 +46,7 @@ export class Renderer {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	}
 
-	public render(camera: Camera): void {
+	public render(camera: Camera): number {
 		// calculate frame times
 		const now = performance.now();
 		const lastRender = this.lastRender || now;
@@ -175,6 +175,8 @@ export class Renderer {
 				}
 			}
 		}
+
+		return deltaTime;
 	}
 
 	public get assets(): Assets {

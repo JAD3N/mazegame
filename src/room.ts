@@ -9,6 +9,7 @@ import {RoomMap} from './map';
 import {Troll} from './sprites/threats/troll';
 import {Parasite} from './sprites/threats/parasite';
 import {Eye} from './sprites/threats/eye';
+import {Threat} from './sprites/threat';
 import {distance} from './utils/math';
 
 export class Room {
@@ -236,6 +237,15 @@ export class Room {
 				}
 			} else {
 				passage.isInside = false;
+			}
+		});
+	}
+
+	public removeThreats(): void {
+		this.isLocked = false;
+		this.sprites.forEach((sprite: Sprite) => {
+			if(sprite instanceof Threat) {
+				this.sprites.delete(sprite);
 			}
 		});
 	}

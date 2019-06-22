@@ -17,6 +17,40 @@
 					"isCorrect": false
 				}
 			]
+		},
+		{
+			"message": "A troll is attacking!",
+			"actions": [
+				{
+					"text": "Run away.",
+					"isCorrect": false
+				},
+				{
+					"text": "Attack with a sword.",
+					"isCorrect": true
+				},
+				{
+					"text": "Ignore the troll.",
+					"isCorrect": false
+				}
+			]
+		},
+		{
+			"message": "The troll is throwing rocks at you. What do you do?",
+			"actions": [
+				{
+					"text": "Block with shield.",
+					"isCorrect": false
+				},
+				{
+					"text": "Dodge.",
+					"isCorrect": true
+				},
+				{
+					"text": "Attack.",
+					"isCorrect": false
+				}
+			]
 		}
 	]
 }

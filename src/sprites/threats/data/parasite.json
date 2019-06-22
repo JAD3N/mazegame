@@ -2,18 +2,35 @@
 	"spawnChance": 0.1,
 	"alerts": [
 		{
-			"message": "Oh no, you've encountered a troll! What will you do?",
+			"message": "A parasite is about to attack. What will you do?",
 			"actions": [
 				{
-					"text": "Use club.",
+					"text": "Don't let it touch you.",
 					"isCorrect": true
 				},
 				{
-					"text": "Punch it.",
+					"text": "Attack it with a sword.",
 					"isCorrect": false
 				},
 				{
 					"text": "Try to reason with it.",
+					"isCorrect": false
+				}
+			]
+		},
+		{
+			"message": "The parasite is distracted. What will you do?",
+			"actions": [
+				{
+					"text": "Throw a potion at it.",
+					"isCorrect": true
+				},
+				{
+					"text": "Use a sword to attack.",
+					"isCorrect": false
+				},
+				{
+					"text": "Ignore it.",
 					"isCorrect": false
 				}
 			]

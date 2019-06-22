@@ -26,16 +26,12 @@
 			-ms-interpolation-mode: nearest-neighbor;
 		}
 
-		.gold-counter {
+		.stats {
 			position: absolute;
 			left: 50%;
 			bottom: 0;
 			transform: translateX(-50%);
 			margin-bottom: 30px;
-		}
-
-		.gold-counter .qty {
-			margin-left: 10px;
 		}
 
 		.hidden {
@@ -89,8 +85,13 @@
 	</style>
 </head>
 <body>
-	<div class="gold-counter prompt hidden">
-		Gold:<span class="qty">0</span>
+	<div class="stats prompt hidden">
+		<div class="gold">
+			Gold: <span class="qty">0</span>
+		</div>
+		<div class="timer">
+			Time: <span class="time">0s</span>
+		</div>
 	</div>
 	<div class="alert prompt hidden">
 		<div class="alert-message"></div>

@@ -7,6 +7,7 @@ import {Treasure} from './room/treasure';
 import {Coin} from './room/coin';
 import {Threat} from './threat';
 import {Game} from '../game';
+import {shuffle} from '../utils/shuffle';
 
 let TEXTURE_FRONT: HTMLImageElement;
 let TEXTURE_BACK: HTMLImageElement;
@@ -128,11 +129,11 @@ export class Player extends Sprite {
 					if(threat.isAlive && this.boundingBox.hits(threat.boundingBox)) {
 						const alertIndex = Math.floor(random() * threat.alerts.length);
 						const alert = threat.alerts[alertIndex];
-						const actions = alert.actions;
+						const actions = shuffle(alert.actions, random);
 
 						game.alert(
 							alert.message,
-							_.chain(alert.actions)
+							_.chain(actions)
 								.map('text')
 								.value()
 						).then((result: string) => {

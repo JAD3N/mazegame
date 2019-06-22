@@ -67,7 +67,15 @@ export class Controller {
 		if(keyCode === KEY_H) Game.SHOW_HITBOXES = !Game.SHOW_HITBOXES;
 		if(keyCode === KEY_M) Game.SHOW_MAP = !Game.SHOW_MAP;
 		if(keyCode === KEY_Q) this.game.player.dropCoin();
-		if(keyCode === KEY_ESC) this.game.showPauseMenu();
+
+		if(keyCode === KEY_ESC) {
+			if(this.game.isPaused) {
+				this.game.hideAlert();
+				this.game.isPaused = false;
+			} else {
+				this.game.showPauseMenu();
+			}
+		}
 	}
 
 	private onKeyUp(event: KeyboardEvent): void {
